@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import leastsq
 import pandas as pd
+from numba import jit
 
 muvals = np.arange(0.1, 20.05, 0.1) 
 thetavals = np.arange(0, 90.5, 1) * np.pi / 180.
@@ -34,3 +35,27 @@ def fit_to_cosh_sinh(y, fy, guesses, fit_array=True):
         return p, y_fit, fy_fit, fy_guess
     return p
 
+########this one doesn't work very well##########
+@jit(nopython=True)
+def res_hyp(guesses, y, fy):
+    a, b, c, d, e = guesses
+    fy_calc = (a * np.sinh(b * y) + c * np.cosh(d * y)) * e * \
+              np.sqrt((1 - y**2))
+    err = np.sum(np.abs(fy - fy_calc))
+    return err
+
+########this one doesn't work very well either##########
+@jit(nopython=True)
+def res_exp(guesses, y, fy):
+    a, b, c, d, e = guesses
+    fy_calc = (a * np.sinh(b * y) + c * np.cosh(d * y)) * e * \
+              np.sqrt((1 - y**2))
+    err = np.sum(np.abs(fy - fy_calc))
+    return err
+
+#Now try putting into polar coordinates
+def get_polar(y, fy):
+    """Puts y, fy into polar coordinates"""
+    dists = np.sqrt(y**2 + fy**2)
+    angles = np.arctan2(fy, y)
+    return dists, angles
