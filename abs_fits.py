@@ -53,7 +53,15 @@ def res_exp(guesses, y, fy):
     err = np.sum(np.abs(fy - fy_calc))
     return err
 
-#Now try putting into polar coordinates
+@jit(nopython=True)
+def res_exp_con(guesses, y, fy):
+    a, b, c, d, e, f = guesses
+    fy_calc = (a * np.sinh(b * y) + c * np.cosh(d * y) + f) * e * \
+              np.sqrt((1 - y**2))
+    err = np.sum(np.abs(fy - fy_calc))
+    return err
+
+#Now try putting into polar coordinates ####doesn't help
 def get_polar(y, fy):
     """Puts y, fy into polar coordinates"""
     dists = np.sqrt(y**2 + fy**2)
