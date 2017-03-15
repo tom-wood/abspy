@@ -134,6 +134,7 @@ bounds_rhc = [(-max_b, max_b), (-10, 10), (-max_b, max_b), (-10, 10),
               (-max_b, max_b), (-max_b, max_b)]
 bounds_rel = bounds_rhc + [(-max_b, max_b)]
 th_i, mu_i = 0, 50
+print 'ok'
 
 #fit_attempts = [fit_data(bounds_rhc[:-1], yvals, fy[th_i, mu_i, :], eval_re,
 #                         res_exp, y_fit) for i in range(10)]
@@ -150,10 +151,20 @@ th_i, mu_i = 0, 50
 #    ax.plot(y_fit, fit_attempts[i][1])
 
 #fit_attempts1 = [fit_data(bounds_rhc, yvals, fy[th_i, mu_i, :], eval_rhc,
-#                         res_hyp_con, y_fit) for i in range(10)]
+#                         res_hyp_con, y_fit) for i in range(15)]
 #fig1, ax1, = fig_setup()
 #ax1.plot(yvals, fy[th_i, mu_i, :], 'o')
 #for i in range(len(fit_attempts1)):
-#    ax1.plot(y_fit, fit_attempts1[i][1])
+#    ax1.plot(y_fit, fit_attempts1[i][1], label=str(i))
+#ax1.legend(loc=0)
 
 #eval_rhc and res_hyp_con seem to work ok, so now to churn through a muval
+mu_fits = []
+for th_i in range(fy.shape[0]):
+    fas = [fit_data(bounds_rhc, yvals, fy[th_i, mu_i, :], eval_rhc,
+                    res_hyp_con) for i in range(15)]
+    errs = np.array([res_hyp_con(fa.x, yvals, fy[th_i, mu_i, :]) for fa in 
+                     fas])
+    mu_fits.append(fas[errs.argmin()])
+    print th_i,
+    print errs.min()
