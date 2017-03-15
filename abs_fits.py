@@ -159,12 +159,74 @@ print 'ok'
 #ax1.legend(loc=0)
 
 #eval_rhc and res_hyp_con seem to work ok, so now to churn through a muval
-mu_fits = []
+#mu_fits = []
+#for th_i in range(fy.shape[0]):
+#    fas = [fit_data(bounds_rhc, yvals, fy[th_i, mu_i, :], eval_rhc,
+#                    res_hyp_con) for i in range(15)]
+#    errs = np.array([res_hyp_con(fa.x, yvals, fy[th_i, mu_i, :]) for fa in 
+#                     fas])
+#    mu_fits.append(fas[errs.argmin()])
+
+#start off using differential_evolution then move to fmin
+#fit_attempts = [fit_data(bounds_rhc, yvals, fy[th_i, mu_i, :], eval_rhc,
+#                         res_hyp_con) for i in range(30)]
+#errs = np.array([res_hyp_con(fa.x, yvals, fy[th_i, mu_i, :]) for fa in 
+#                 fit_attempts])
+#init_guess = fit_attempts[errs.argmin()].x
+#mu_fits = []
+#print 'start simplex'
+#for th_i in range(fy.shape[0]):
+#    if th_i == 0:
+#        mu_fits.append(opt.fmin(res_hyp_con, init_guess, 
+#                                args=(yvals, fy[th_i, mu_i, :]),
+#                                full_output=True)[:2])
+#    else:
+#        mu_fits.append(opt.fmin(res_hyp_con, mu_fits[th_i - 1][0],
+#                                args=(yvals, fy[th_i, mu_i, :]),
+#                                full_output=True)[:2])
+#    print str(th_i)
+
+#####now try using polynomials...########
+poly_deg = 20
+#mu_fits = np.zeros((fy.shape[0], fy.shape[1], poly_deg + 1))
+#for th_i in range(fy.shape[0]):
+#    for mu_i in range(fy.shape[1]):
+#        p = np.polyfit(yvals[1:-1], fy[th_i, mu_i, 1:-1] / \
+#                                    np.sqrt(1 - yvals[1:-1]**2), 20)
+#        mu_fits[th_i, mu_i, :] = p
+mu_i = np.searchsorted(muvals, 3.2)
+mu_fits = np.zeros((fy.shape[0], poly_deg + 1))
 for th_i in range(fy.shape[0]):
-    fas = [fit_data(bounds_rhc, yvals, fy[th_i, mu_i, :], eval_rhc,
-                    res_hyp_con) for i in range(15)]
-    errs = np.array([res_hyp_con(fa.x, yvals, fy[th_i, mu_i, :]) for fa in 
-                     fas])
-    mu_fits.append(fas[errs.argmin()])
-    print th_i,
-    print errs.min()
+    p = np.polyfit(yvals[1:-1], fy[th_i, mu_i, 1:-1] / \
+                                np.sqrt(1 - yvals[1:-1]**2), 20)
+    mu_fits[th_i] = p
+
+poly_deg2 = 18
+th_fits = np.zeros((poly_deg + 1, poly_deg2 + 1))
+for p_i in range(poly_deg + 1):
+    pfit = np.polyfit(thetavals, mu_fits[:, p_i], poly_deg2)
+    th_fits[p_i] = pfit
+
+#th_fit = np.linspace(0, thetavals[-1], 1000)
+#foo = np.polyval(th_fits[0], th_fit)
+#fig, ax = fig_setup()
+#ax.plot(thetavals, mu_fits[:, 0], 'o')
+#ax.plot(th_fit, foo)
+
+#now to output this into to a TOPAS macro...
+tstr = 'macro {\n' + ''
+
+#########now try to multiple polyfit these to a 5 x 5
+#make muvals same number as thetavals
+#mu_90_is = []
+#counter = 0
+#c = 200 / 90.
+#for i in range(200):
+#    if i >= counter:
+#        mu_90_is.append(i)
+#        counter += c
+#mu_90_is.append(199)
+
+#now stack up the xvals
+#xvals = np.vstack((theta_vals, mu_vals[tuple(mu_90_is)])).T
+#yvals = 
