@@ -233,7 +233,8 @@ p_abs2 = p_abs2[:-3]
 p_abs2 += ') * Sqrt(1 - y_abs^2)'
 p_abs2 += '; min = (-0.5 / Rs) Rad; max = (0.5 / Rs) Rad;\n'
 
-tstr = 'macro Cylinder_Peak_Position {\n' + p_abs + p_abs2 + '}'
+tstr = 'macro Cylinder_Peak_Position {\n' 
+tstr += p_abs + p_abs2 + '}'
 
 write = False
 if write:

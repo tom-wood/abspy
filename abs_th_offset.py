@@ -70,13 +70,29 @@ for i in range(poly_deg + 1):
 #    ax.plot(muvals, off_ps[:, i], 'o')
 #    ax.plot(p_fits_x, np.polyval(p_fits[i], p_fits_x))
 
-p_abs = ''
+p_abs = 'If_Prm_Eqn_Rpt(murc, murv, min 0.1, max 20)\n'
 for i1 in range(poly_deg + 1):
     p_str = 'prm #m_unique p_off' + str(i1) + ' = '
     for i2 in range(p_deg + 1):
-        p_str = p_str + '(' + str(p_fits[i1][i2]) + ') * mur^%d + '\
-                                  % (p_deg - i2)
+        p_str = p_str + '(' + str(p_fits[i1][i2]) + \
+                ') * CeV(murc, murv)^%d + ' % (p_deg - i2)
     p_str = p_str[:-2]
     p_str += ';\n'
     p_abs += p_str
+
+p_abs2 = 'th2_offset = ('
+for i1 in range(poly_deg + 1):
+    p_abs2 = p_abs2 + 'p_off' + str(i1) + '* Th^%d + ' % (poly_deg - i1)
+
+p_abs2 = p_abs2[:-3]
+p_abs2 += ') * (0.5 / Rs) Rad;' 
+
+tstr = 'macro Cylinder_Peak_Position {\n' 
+tstr += '#m_argu murc\n'
+tstr += p_abs + p_abs2 + '}'
+
+write = True
+if write:
+    with open('macro_th2offset3pt1.txt', 'w') as f:
+        f.write(tstr)
 
