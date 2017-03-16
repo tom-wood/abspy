@@ -194,7 +194,7 @@ poly_deg = 20
 #        p = np.polyfit(yvals[1:-1], fy[th_i, mu_i, 1:-1] / \
 #                                    np.sqrt(1 - yvals[1:-1]**2), 20)
 #        mu_fits[th_i, mu_i, :] = p
-mu_i = np.searchsorted(muvals, 3.2)
+mu_i = np.searchsorted(muvals, 18)
 mu_fits = np.zeros((fy.shape[0], poly_deg + 1))
 for th_i in range(fy.shape[0]):
     p = np.polyfit(yvals[1:-1], fy[th_i, mu_i, 1:-1] / \
@@ -214,7 +214,31 @@ for p_i in range(poly_deg + 1):
 #ax.plot(th_fit, foo)
 
 #now to output this into to a TOPAS macro...
-tstr = 'macro {\n' + ''
+#p_abs = ['prm !p_abs' + str(i) + ' = ' + for i in range(poly_deg + 1)]
+p_abs = ''
+for i1 in range(poly_deg + 1):
+    p_str = 'prm !p_abs' + str(i1) + ' = '
+    for i2 in range(poly_deg2 + 1):
+        p_str = p_str + '(' + str(th_fits[i1][i2]) + ') * Th^%d + '\
+                                  % (poly_deg2 - i2)
+    p_str = p_str[:-2]
+    p_str += ';\n'
+    p_abs += p_str
+
+p_abs2 = 'prm y_abs = 2 X Rs Deg;\n'
+p_abs2 += 'user_defined_convolution = ('
+for i1 in range(poly_deg + 1):
+    p_abs2 = p_abs2 + 'p_abs' + str(i1) + '* y_abs^%d + ' % (poly_deg - i1)
+p_abs2 = p_abs2[:-3]
+p_abs2 += ') * Sqrt(1 - y_abs^2)'
+p_abs2 += '; min = (-0.5 / Rs) Rad; max = (0.5 / Rs) Rad;\n'
+
+tstr = 'macro Cylinder_Peak_Position {\n' + p_abs + p_abs2 + '}'
+
+write = False
+if write:
+    with open('topas_macro18.txt', 'w') as f:
+        f.write(tstr)
 
 #########now try to multiple polyfit these to a 5 x 5
 #make muvals same number as thetavals
