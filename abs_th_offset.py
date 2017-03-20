@@ -93,6 +93,6 @@ tstr += p_abs + p_abs2 + '}'
 
 write = True
 if write:
-    with open('macro_th2offset3pt1.txt', 'w') as f:
+    with open('macro_th2offset.txt', 'w') as f:
         f.write(tstr)
 
