@@ -80,16 +80,16 @@ for i1 in range(poly_deg + 1):
     p_str += ';\n'
     p_abs += p_str
 
-p_abs2 = 'th2_offset = ('
+p_abs2 = 'prm #m_unique y_abs = ('
 for i1 in range(poly_deg + 1):
     p_abs2 = p_abs2 + 'p_off' + str(i1) + '* Th^%d + ' % (poly_deg - i1)
 
 p_abs2 = p_abs2[:-3]
 p_abs2 += ') * (0.5 / Rs) Rad;' 
 
-tstr = 'macro Cylinder_Peak_Position {\n' 
+tstr = 'macro Cylinder_Peak_Position(murc, murv) {\n' 
 tstr += '#m_argu murc\n'
-tstr += p_abs + p_abs2 + '}'
+tstr += p_abs + p_abs2 + '\nth2_offset = ((0.5 y_abs) / Rs) Rad;\n}'
 
 write = True
 if write:
