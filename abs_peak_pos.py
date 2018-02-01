@@ -4,9 +4,11 @@ from numba import jit
 
 #start off for mu = 1, r = 0.5, theta = 0 (because, well, why not?)
 r = 0.5
-muvals = np.arange(0.1, 20.05, 0.1) 
+muvals = np.arange(0.1, 20.05, 0.1) #these are actually mu*r values 
 thetavals = np.arange(0, 90.5, 1) * np.pi / 180.
 num_yvals = 400
+write_vals = True
+
 @jit(nopython=True)
 def get_vals(muvals, thetavals, r, num_yvals):
     yvals = np.linspace(-1., 1., num_yvals)
@@ -28,3 +30,16 @@ def get_vals(muvals, thetavals, r, num_yvals):
                 fy[im, it, i1] = 0.5 * np.sum(fybit)
         print mu
     return fy
+
+fy = get_vals(muvals, thetavals, r, num_yvals)
+
+if write_vals:
+    fnames = ['abs_1mmdiam_capillary_theta' + str(th) + '.csv' for th in 
+              range(91)]
+    murvals_a = np.concatenate((np.array([0]), muvals))
+    yvals = np.linspace(-1, 1., num_yvals)
+    yvals = yvals.reshape(yvals.shape[0], 1)
+    for i in range(91):
+        values = np.column_stack((yvals, fy[:, i, :].T))
+        values = np.row_stack((muvals_a, values))
+        np.savetxt(fn, values, delimiter=',')

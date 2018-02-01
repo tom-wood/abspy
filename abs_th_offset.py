@@ -9,6 +9,7 @@ def fig_setup():
     ax = fig.add_subplot(111)
     return fig, ax
 
+write = True
 muvals = np.arange(0.1, 20.05, 0.1) 
 thetavals = np.arange(0, 90.5, 1) * np.pi / 180.
 num_yvals = 400
@@ -91,7 +92,6 @@ tstr = 'macro Cylinder_Peak_Position(murc, murv) {\n'
 tstr += '#m_argu murc\n'
 tstr += p_abs + p_abs2 + '\nth2_offset = ((0.5 y_abs) / Rs) Rad;\n}'
 
-write = True
 if write:
     with open('macro_th2offset.txt', 'w') as f:
         f.write(tstr)
