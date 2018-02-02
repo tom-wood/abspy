@@ -10,6 +10,11 @@ def fig_setup():
     return fig, ax
 
 write = True
+rad = 0.35 
+macro_fname = 'macro_th2offset_pt7.txt'
+fnames = ['abs_pt7mmdiam_capillary_theta' + str(r) + '.csv' for r in 
+          range(91)]
+
 muvals = np.arange(0.1, 20.05, 0.1) 
 thetavals = np.arange(0, 90.5, 1) * np.pi / 180.
 num_yvals = 400
@@ -17,19 +22,10 @@ yvals = np.linspace(-1., 1., num_yvals)
 ydiff = yvals[1] - yvals[0]
 fy = np.zeros((len(thetavals), len(muvals), len(yvals)))
 
-fnames = ['abs_1mmdiam_capillary_theta' + str(r) + '.csv' for r in 
-          range(91)]
 for i, fn in enumerate(fnames):
     data = pd.read_csv(fn, sep=',')
     fy[i] = data.values[:, 1:].T
 print 'ok'
-
-#mu_i = np.searchsorted(muvals, 18)
-#mu_fits = np.zeros((fy.shape[0], poly_deg + 1))
-#for th_i in range(fy.shape[0]):
-#    p = np.polyfit(yvals[1:-1], fy[th_i, mu_i, 1:-1] / \
-#                                np.sqrt(1 - yvals[1:-1]**2), 20)
-#    mu_fits[th_i] = p
 
 def get_offsets(yvals, fy):
     offsets = np.zeros(fy.shape[:2])
@@ -43,9 +39,6 @@ def get_offsets(yvals, fy):
 
 offsets = get_offsets(yvals, fy)
 
-#now fit to muval of 3.2
-#mu_i = np.searchsorted(muvals, 3.2)
-#mu_i = -1
 poly_deg = 6
 off_ps = np.zeros((offsets.shape[1], poly_deg + 1))
 for mu_i in range(len(muvals)):
@@ -86,13 +79,13 @@ for i1 in range(poly_deg + 1):
     p_abs2 = p_abs2 + 'p_off' + str(i1) + '* Th^%d + ' % (poly_deg - i1)
 
 p_abs2 = p_abs2[:-3]
-p_abs2 += ') * (0.5 / Rs) Rad;' 
+p_abs2 += ') * (%f / Rs) Rad;' % rad
 
 tstr = 'macro Cylinder_Peak_Position(murc, murv) {\n' 
 tstr += '#m_argu murc\n'
-tstr += p_abs + p_abs2 + '\nth2_offset = ((0.5 y_abs) / Rs) Rad;\n}'
+tstr += p_abs + p_abs2 + '\nth2_offset = ((%f y_abs) / Rs) Rad;\n}' % rad
 
 if write:
-    with open('macro_th2offset.txt', 'w') as f:
+    with open(macro_fname, 'w') as f:
         f.write(tstr)
 
