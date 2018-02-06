@@ -4,6 +4,7 @@ from numba import jit
 
 #start off for mu = 1, r = 0.5, theta = 0 (because, well, why not?)
 r = 0.35
+save_fname = 'abs_pt7mmdiam_capillary_theta'
 muvals = np.arange(0.1, 20.05, 0.1) #these are actually mu*r values 
 thetavals = np.arange(0, 90.5, 1) * np.pi / 180.
 num_yvals = 400
@@ -34,7 +35,7 @@ def get_vals(muvals, thetavals, r, num_yvals):
 fy = get_vals(muvals, thetavals, r, num_yvals)
 
 if write_vals:
-    fnames = ['abs_pt7mmdiam_capillary_theta' + str(th) + '.csv' for th in 
+    fnames = [save_fname + str(th) + '.csv' for th in 
               range(91)]
     muvals_a = np.concatenate((np.array([0]), muvals))
     yvals = np.linspace(-1, 1., num_yvals)
